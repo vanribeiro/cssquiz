@@ -31,6 +31,10 @@
     ],
     "theme": {
       "colors": {
+        "buttonBg": "#eca769",
+        "questionBg": "#eca769",
+        "buttonFontColor": "1a1a1a",
+        "inputBorder": "#eca769",
         "githubCornerBg":"#eca769",
         "githubCornerInner":"#1a1a1a",
         "primary": "#0d47a1",
