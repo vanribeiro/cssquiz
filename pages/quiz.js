@@ -1,15 +1,30 @@
 import React from 'react';
 import styled from 'styled-components';
 import Head from 'next/head';
-// import { useRouter } from 'next/router';
 import db from '../db.json';
 import Widget from '../src/components/Widget';
 import QuizLogo from '../src/components/QuizLogo';
 import QuizBackground from '../src/components/QuizBackground';
 import Footer from '../src/components/Footer';
 import GitHubCorner from '../src/components/GitHubCorner';
-// import Input from '../src/components/Input';
 import Button from '../src/components/Button';
+
+const LoadingWidget = () => (
+  <Widget>
+    <img
+      style={{
+        width: '100%',
+        height: '200px',
+        objectFit: 'cover',
+      }}
+      src={db.loadingImages[0]}
+      alt="Aguardando Carregar as Questões"
+    />
+    <Widget.Content>
+      Carregando o Quiz...
+    </Widget.Content>
+  </Widget>
+);
 
 export const QuizContainer = styled.div`
   width: 100%;
@@ -53,7 +68,10 @@ const QuestionWidget = ({
           <p>
             {question.description}
           </p>
-          <form>
+          <form onSubmit={(event) => {
+            event.preventDefault();
+          }}
+          >
             {question.alternatives.map((alternative, alternativeIndex) => {
               const alternativeID = `alternative_${alternativeIndex}`;
               return (
@@ -82,10 +100,33 @@ const QuestionWidget = ({
   );
 };
 
+const screenStates = {
+  QUIZ: 'QUIZ',
+  LOADING: 'LOADING',
+  RESULT: 'RESULT',
+};
+
 const QuizPage = () => {
+  const [screenState, setScreenState] = React.useState(screenStates.LOADING);
   const totalQuestions = db.questions.length;
-  const questionIndex = 0;
+  const [currentQuestion, setCurrentQuestion] = React.useState(0);
+  const questionIndex = currentQuestion;
   const question = db.questions[questionIndex];
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setScreenState(screenStates.QUIZ);
+    }, 2 * 1000);
+  }, []);
+
+  const handleSubmit = () => {
+    const nextQuestion = questionIndex + 1;
+    // eslint-disable-next-line no-unused-expressions
+    nextQuestion < totalQuestions
+      ? setCurrentQuestion(nextQuestion)
+      : setScreenState(screenStates.RESULT);
+  };
+
   return (
     <QuizBackground backgroundImage={db.bg}>
       <Head>
@@ -93,11 +134,19 @@ const QuizPage = () => {
       </Head>
       <QuizContainer>
         <QuizLogo />
-        <QuestionWidget
-          question={question}
-          questionIndex={questionIndex}
-          totalQuestions={totalQuestions}
-        />
+        {screenState === screenStates.QUIZ && (
+          <QuestionWidget
+            question={question}
+            questionIndex={questionIndex}
+            totalQuestions={totalQuestions}
+            onSubmit={handleSubmit}
+          />
+        )}
+        {screenState === screenStates.LOADING && <LoadingWidget />}
+
+        {screenState === screenStates.RESULT && (
+          <h1>{`Você acertou 1 de ${totalQuestions}`}</h1>
+        )}
         <Footer />
       </QuizContainer>
       <GitHubCorner projectUrl="https://github.com/vanribeiro" />

@@ -42,7 +42,6 @@ export default function Home() {
             <form onSubmit={(event) => {
               event.preventDefault();
               router.push(`/quiz?name=${name}`);
-              console.log('submitting');
             }}
             >
               <Input
@@ -50,7 +49,6 @@ export default function Home() {
                 placeholder="Qual é o seu nome?"
                 onChange={(event) => {
                   setName(event.target.value);
-                  console.log(name);
                 }}
                 value={name}
               />
